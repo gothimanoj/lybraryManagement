@@ -12,6 +12,8 @@ const AdminCtrl = require('../controllers/admin.js');
 
 router.post('/admin',auth,AdminCtrl.AdminCreateBook);
 router.get('/admin',auth,AdminCtrl.getAdmin);
+router.post('/admin/users/:page',auth,AdminCtrl.SearchedUser);
+
 
 
 module.exports = router

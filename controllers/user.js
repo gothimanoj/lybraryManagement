@@ -11,8 +11,10 @@ module.exports = {
     try {
       const { firstName, lastName, username, email, address, password } =
         req.body;
+      const profile = req.url;
+
       // console.log(req.body);
-      if (firstName && lastName && username && email && address && password) {
+      if (firstName && lastName && username && email && address && password && profile) {
         //password hashing
         const passwordHash = await bcrypt.hash(password, 10);
         // console.log(passwordHash,"password")
@@ -26,6 +28,7 @@ module.exports = {
             email,
             address,
             password: passwordHash,
+            profile
           });
           console.log(newUser);
           await newUser.save();
@@ -152,33 +155,33 @@ module.exports = {
 
       const issue = await IssueModel.findOne({searchObj });
       console.log(issue);
-      await issue.remove();
+      // await issue.remove();
 
       // req.user.bookIssueInfo.splice(pos, 1);
       // await req.user.save();
 
-      const activity = new ActivityModel({
-        info: {
-          id: issue.book_info.id,
-          title: issue.book_info.title,
-        },
-        category: "Return",
-        time: {
-          id: issue._id,
-          issueDate: issue.book_info.issueDate,
-          returnDate: issue.book_info.returnDate,
-        },
-        user_id: {
-          id: req.user._id,
-          username: req.user.username,
-        },
-      });
-      console.log(activity, "activity");
-      await activity.save();
+      // const activity = new ActivityModel({
+      //   info: {
+      //     id: issue.book_info.id,
+      //     title: issue.book_info.title,
+      //   },
+      //   category: "Return",
+      //   time: {
+      //     id: issue._id,
+      //     issueDate: issue.book_info.issueDate,
+      //     returnDate: issue.book_info.returnDate,
+      //   },
+      //   user_id: {
+      //     id: req.user._id,
+      //     username: req.user.username,
+      //   },
+      // });
+      // console.log(activity, "activity");
+      // await activity.save();
 
       res.json({
         success: true,
-        message: "Successfully updated",
+        message: "Successfully return Book ",
       });
     } catch (err) {
       console.log(err);
@@ -198,9 +201,9 @@ module.exports = {
       console.log("serachObj", searchObj);
       const issue = await IssueModel.findOne(searchObj);
 
-      let time = issue.book_info.returnDate.getTime();
-      issue.book_info.returnDate = time + 7 * 24 * 60 * 60 * 1000;
-      issue.book_info.isRenewed = true;
+      // let time = issue.book_info.returnDate.getTime();
+      // issue.book_info.returnDate = time + 7 * 24 * 60 * 60 * 1000;
+      // issue.book_info.isRenewed = true;
 
       const activity = new ActivityModel({
         info: {
@@ -220,9 +223,9 @@ module.exports = {
       });
 
       await activity.save();
-      await issue.save();
+      // await issue.save();
 
-      res.json({ success: true, message: "Successfully updated" });
+      res.json({ success: true, message: "Renew Book Successfully updated" });
     } catch (err) {
       console.log(err);
       res.json({ success: false, message: err.message });
@@ -324,4 +327,79 @@ module.exports = {
       res.json({ success: false, message: error.message });
     }
   },
+  SearchBook : async (req,res) => {
+    console.log("hello")
+    try {
+        const page = req.params.page || 1;
+        const search_value = req.body.searchBook;
+        console.log(search_value,"hello");
+
+        const books = await bookModel.find({
+            $or: [
+                {"title": search_value},
+                {"author": search_value},
+                {"category": search_value},
+                {"ISBN": search_value},
+            ]
+        });
+ 
+        if(books.length <= 0) {
+             res.json({message: "Not a create Books found"});
+        } else {
+            res.json({
+                success:true,
+                message:"your searched Books",
+                books: books,
+                current: page,
+                pages: 0,
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.json({success:false,
+             message:err})
+    }
+},
+getByIdBooks: async (req, res) => {
+  try {
+
+      const match =
+      {
+          ...(req.query.title ? { title: req.query.title } : {}),
+          ...(req.query.ISBN ? { ISBN: req.query.ISBN } : {}),
+          ...(req.query.author ? { author: req.query.author } : {}),
+          ...(req.query.category ? { category: { $regex: req.query.category, $options: 'i' } } : {}),
+
+
+      }
+
+      const result = await bookModel.find(match)
+          .populate({ path: 'comments' }) 
+
+      if (result.length) {
+
+          return res.status(201).json({
+              success: true,
+              message: "all searched user books",
+              data: result
+          })
+      }
+      else {
+          return res.json({
+              message: "not a searched books",
+              data: result
+          })
+      }
+
+  } catch (error) {
+      console.log(error);
+      res.status(404).json({
+          success: false,
+          message: "not match a searched books",
+          data: error
+
+      })
+  }
+},
+
 };

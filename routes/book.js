@@ -7,7 +7,7 @@ router.post('/bookcreate',auth,book.createBook);
 
 router.get('/books/:value/:page',auth,book.getAllBooks);
 
-router.get('/books/:details/:book_id',auth,book.getBookDetails);
+router.get('/books/:book_id',auth,book.getBookDetails);
 
 
 

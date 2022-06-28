@@ -57,9 +57,11 @@ module.exports ={
         }
      },
      SearchedUser : async (req,res) => {
+        console.log("hello")
         try {
             const page = req.params.page || 1;
             const search_value = req.body.searchUser;
+            console.log(search_value,"hello");
     
             const users = await UserModel.find({
                 $or: [

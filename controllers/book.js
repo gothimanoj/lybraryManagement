@@ -33,7 +33,7 @@ module.exports = {
     getAllBooks : async(req,res)=>{
         
         const page = req.params.page || 1;
-        const value = req.params.value;
+        // const value = req.params.value;
         let searchObj = {};
 
 
@@ -57,7 +57,7 @@ module.exports = {
         try {
            const book_id = req.params.book_id;
            console.log(book_id,"book")
-           const book = await bookModel.findById(book_id).populate("Comments");
+           const book = await bookModel.findById(book_id)//.populate({parh:"Comments"});
            console.log(book,"book2");
            res.json({success: true,
               message:"book get details",
@@ -66,11 +66,11 @@ module.exports = {
         //    console.log(err);
             res.json({ success:false,
                 mes:"can't get details",
-                title:"who is a better management",
-                ISBN:"12-457-4875",
-                stock:36,
-                author:"Smrati Devi",
-                category:"History",
+                // title:"who is a better management",
+                // ISBN:"12-457-4875",
+                // stock:36,
+                // author:"Smrati Devi",
+                // category:"History",
                 
                 
             })

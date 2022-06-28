@@ -10,6 +10,8 @@ router.post("/books/:book_id/return",auth,user.ReturnBook);
 router.post("/books/:book_id/renew",auth,user.RenewBook);
 router.post("/books/details/:book_id/comment",auth,user.NewComment);
 router.get("/user/details/allbooks/:user_id",auth,user.getAllBooks);
+router.post("/books/details/:book_id/:comment_id", auth, user.UpdateComment);
+
 
 
 
